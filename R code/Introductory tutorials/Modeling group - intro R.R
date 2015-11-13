@@ -21,7 +21,7 @@ tom
 
 #find out what class an object is 
 class(tom)    #tom from above is numeric
-class(as.factor(tom))
+tom <- class(as.factor(tom))
 
 
 #storing data as vectors and data frame
@@ -32,7 +32,7 @@ marcus     #this is a vector of numbers
 marcus <- marcus+2   #this operation will add 2 to EACH element of marcus
 marcus
 
-carissa <- c(5,6,7,8,9)  #make a second vector
+carissa <- c(5,6,7,8)  #make a second vector
 df <- data.frame(marcus, carissa)     #combine the vectors to make a 2 column dataframe (this is the main structure for ecological data)
 df  #this is a data frame
 str(df)   #get a summary of the "structure" of a dataframe
@@ -41,6 +41,8 @@ str(df)   #get a summary of the "structure" of a dataframe
 #square brackets are the best way to call specific elements of a dataframe, vector, or matrix
 df[1,1]    #single element in row 1, column 1
 df[1:3,]   #rows 1 through 3 in all columns
+
+df[df$marcus==1 | df$marcus==2,]
 
 #reference a specific column by name in the dataframe using the $ operator
 df$marcus
@@ -103,7 +105,7 @@ apply(X, 1:2, function(x) x/2)   #1:2 means both rows and columns
 tapply(diamonds$price, diamonds$cut, mean)    #OK not bad, we did it in just a single line!
 
 #we can also do more complex summarization this way:
-tapply(diamonds$price, list(diamonds$cut, diamonds$color), mean)
+tapply(diamonds$price, list(diamonds$cut, diamonds$color, diamonds$clarity), mean)
 
 
 
@@ -117,7 +119,7 @@ tapply(diamonds$price, list(diamonds$cut, diamonds$color), mean)
 ddply(diamonds, .(cut), summarize, price=mean(price))   #the first argument specifices the dataset, the second argument specifies a variable by which to split the dataset, the third argument says what to create from output (summarize means new dataframe with summary values, transform would modify an existing dataframe), and the fourth argument here specifies the functions to apply to each piece. 
 
 #as above, we can get fancier easily
-ddply(diamonds, .(cut, color), summarize, price=mean(price))
+ddply(diamonds, .(cut, color), summarize, avgprice=mean(price), sum=sum(price))
 
 
 
@@ -126,9 +128,7 @@ ddply(diamonds, .(cut, color), summarize, price=mean(price))
 # The chained dplyr version
 library(dplyr)
 
-diamonds %>% # start by specifying the data.frame
-  group_by(cut) %>%  # The specify the grouping variables
-  summarize(price = mean(price))
+diamonds %>% group_by(cut) %>% summarize(price = mean(price))
 
 # a more complex use of dplyr
 mods <- diamonds %>% 
@@ -213,8 +213,8 @@ diamonds %>%
   summarise(
     mean.price = mean(price, na.rm = TRUE),
     sd.price = sd(price, na.rm = TRUE),
-    mean.depth = mean(price, na.rm = TRUE),
-    sd.depth = sd(price, na.rm = TRUE)    
+    mean.depth = mean(depth, na.rm = TRUE),
+    sd.depth = sd(depth, na.rm = TRUE)    
   ) %>%
   filter(mean.price > 3000 | mean.depth < 4000)   #that's alot of stuff all at once, and it's very easy to see the process or extend it
 
@@ -235,3 +235,5 @@ long.messy <- gather(messy, Categories, HappinessValue, c(a,b))
 
 #convert the long format back to wide
 spread(long.messy, key=Categories, value=HappinessValue)
+
+#
