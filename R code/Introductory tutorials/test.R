@@ -12,3 +12,8 @@ url1 <- getURL("https://raw.githubusercontent.com/ThomasKraft/Dartmouth-EEES-Mod
 cdat <- read.csv(textConnection(url1))
 
 str(cdat)  #if you dont get any errors then this is a success!
+
+
+cdat %>%
+  group_by(PROV, SITE) %>%
+  summarize(prop.serot=mean(SEROT))
